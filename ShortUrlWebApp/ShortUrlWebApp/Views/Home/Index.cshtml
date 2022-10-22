@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ShortUrl</title>
+    <link rel="stylesheet" href="~/css/style.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+<body>
+    <div id="bg"></div>
+
+    <form id="form">
+        <div>
+            <p class="short-title">SHORT URL</p>
+        </div>
+        <div class="form-field long-url">
+            <input id="long-url-value" type="text" name="longurl" placeholder="Enter your long URL" required />
+        </div>
+
+        <div class="form-field short-url">
+            <input id="short-url-value" name="shorturl" type="text" /> 
+            <button id="copy-button">Copy</button>
+        </div>
+
+        <div class="form-field">
+            <button id="short_button" class="btn" type="submit">Shorten URL</button>
+        </div>
+    </form>
+
+</body>
+</html>
+
+<script>
+
+    $(document).ready(function () {
+        var form = document.getElementById("form");
+        var shortUrl = document.getElementsByClassName("short-url")[0];
+        var shortUrlField = document.getElementById("short-url-value");
+        var longUrlField = document.getElementById("long-url-value");
+        var copyBtn = document.getElementById("copy-button");
+        var shortBtn = document.getElementById("short_button");
+
+        var getFormData = () => {
+            return new FormData(form);
+        }
+
+        $("#form").submit(function (e) { 
+            e.preventDefault(); 
+        });
+
+        shortUrl.style.display = 'none';
+
+        var copy = function () {
+
+            shortUrlField.select();
+            shortUrlField.setSelectionRange(0, 99999);
+
+            navigator.clipboard.writeText(shortUrlField.value);
+            
+            copyBtn.innerHTML = 'Copied';
+        }
+
+        var shortenUrl = function (event) {
+
+            if (shortBtn.innerHTML === 'Shorten another URL'){
+                $('#long-url-value').val('');
+                shortBtn.innerHTML = 'Shorten';
+                copyBtn.innerHTML = 'Copy';
+                shortUrl.style.display = 'none';
+                return;
+            }
+
+            var formData = getFormData();
+            var object = {};
+            formData.forEach((value, key) => {
+                if (!Reflect.has(object, key)) {
+                    object[key] = value;
+                    return;
+                }
+                if (!Array.isArray(object[key])) {
+                    object[key] = [object[key]];
+                }
+                object[key].push(value);
+            });
+            var json = JSON.stringify(object);
+
+            $.ajax({
+                type: "POST",
+                beforeSend: function (request) {
+                }, 
+                contentType: "application/json",
+                url: "http://localhost:8000/shorten",
+                data: json,
+                dataType: "text",
+                success: function (data) {
+                    console.log(data);
+                    $('#short-url-value').val(data);
+                    shortUrl.style.display = '';
+                    shortBtn.innerHTML = 'Shorten another URL';
+                },
+                error: function (msg) {
+                    
+                }
+            });
+        };
+
+        copyBtn.addEventListener("click", copy);
+        shortBtn.addEventListener("click", shortenUrl);
+    });
+    
+</script>
