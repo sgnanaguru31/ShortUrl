@@ -5,7 +5,7 @@ Docker running with linux container
 
 ## Build and execute
 1. Clone the project    
-`git clone`    
+`git clone https://github.com/sgnanaguru31/ShortUrl.git`    
 2. At the root folder execute    
 `docker-compose up -d`
 
