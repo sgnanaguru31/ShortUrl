@@ -9,7 +9,7 @@ Docker running with linux container
 2. At the root folder execute    
 `docker-compose up -d`
 
-## Accessible URLs
+## Application URLs
 ### Web app url:    
 `http://localhost:9000`
 
@@ -37,4 +37,14 @@ Api to redirect short url to original url
 ```
 Status Code: 302    
 Location: https://yourlongurl/test
+```
+### Postgres Configuration
+
+Postgres container config   
+```
+server: localhost
+container-name: postgresql
+user: postgres
+password: postgres
+port: 5432
 ```
