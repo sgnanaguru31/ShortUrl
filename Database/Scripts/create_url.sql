@@ -4,3 +4,6 @@ CREATE TABLE Url (
 	long_url VARCHAR ( 1000 ) NOT NULL,
 	created_on DATE NOT NULL
 );
+
+CREATE INDEX index_short_url
+ON url (short_url);
