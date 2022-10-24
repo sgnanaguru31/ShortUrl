@@ -1,9 +1,13 @@
-﻿namespace ShortUrlWebApi.Business
+﻿using System.Threading.Tasks;
+
+namespace ShortUrlWebApi.Business
 {
     public interface IUrlBusiness
     {
-        public string GetLongUrl(string ShortUrl);
-        public string ShortenUrl(string url, int keyLength);
-        public void SaveShortUrl(string shortUrl, string longUrl);
+        Task<string> GetLongUrlAsync(string ShortUrl);
+
+        Task<string> ShortenUrlAsync(string url, int keyLength);
+
+        Task SaveShortUrlAsync(string shortUrl, string longUrl);
     }
 }

@@ -3,6 +3,7 @@ using Npgsql;
 using ShortUrlWebApi.DataProvider;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ShortUrlWebApi.DataProviderImpl
 {
@@ -16,7 +17,7 @@ namespace ShortUrlWebApi.DataProviderImpl
             this.connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public void SaveShortUrl(string shortUrl, string longUrl)
+        public async Task SaveShortUrlAsync(string shortUrl, string longUrl)
         {
             using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
             {
@@ -26,12 +27,12 @@ namespace ShortUrlWebApi.DataProviderImpl
                     cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("short_url", shortUrl);
                     cmd.Parameters.AddWithValue("long_url", longUrl);
-                    cmd.ExecuteReader();
+                    await cmd.ExecuteReaderAsync();
                 }
             }
         }
 
-        public string GetLongUrl(string shortUrl)
+        public async Task<string> GetLongUrlAsync(string shortUrl)
         {
             string query = $"SELECT long_url FROM url WHERE short_url='{shortUrl}'";
             string longurl = string.Empty;
@@ -42,7 +43,7 @@ namespace ShortUrlWebApi.DataProviderImpl
                 {
                     using (var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection))
                     {
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
                             longurl = reader.GetString(0);
                         }

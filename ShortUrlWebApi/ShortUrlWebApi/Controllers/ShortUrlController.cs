@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using ShortUrlWebApi.Business;
 using ShortUrlWebApi.Models;
+using System.Threading.Tasks;
 
 namespace ShortUrlWebApi.Controllers
 {
@@ -20,20 +21,20 @@ namespace ShortUrlWebApi.Controllers
 
         [HttpPost]
         [Route("shorten")]
-        public string Post([FromBody] LongUrlPost url)
+        public async Task<string> Post([FromBody] LongUrlPost url)
         {
-            var shortKey = this.urlBusiness.ShortenUrl(url.LongUrl, url.KeyLength);
+            var shortKey = await this.urlBusiness.ShortenUrlAsync(url.LongUrl, url.KeyLength);
             var shortUrl = $"{Request.Scheme}://{Request.Host}/{shortKey}";
-            this.urlBusiness.SaveShortUrl(shortUrl, url.LongUrl);
+            await this.urlBusiness.SaveShortUrlAsync(shortUrl, url.LongUrl);
             return shortUrl;
         }
 
         [HttpGet]
         [Route("{key}")]
-        public void Get(string key)
+        public async Task GetAsync(string key)
         {
             var shortUrl = $"{Request.Scheme}://{Request.Host}/{key}";
-            Response.Redirect(this.urlBusiness.GetLongUrl(shortUrl));
+            Response.Redirect(await this.urlBusiness.GetLongUrlAsync(shortUrl));
         }
     }
 }

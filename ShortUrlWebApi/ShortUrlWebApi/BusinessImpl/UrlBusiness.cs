@@ -14,17 +14,20 @@ namespace ShortUrlWebApi.BusinessImpl
     {
         private readonly IUrlDataHandler urlDataHandler;
 
-        public UrlBusiness(IUrlDataHandler urlDataHandler)
+        private readonly IHttpClientBusiness httpClientBusiness;
+
+        public UrlBusiness(IUrlDataHandler urlDataHandler, IHttpClientBusiness httpClientBusiness)
         {
             this.urlDataHandler = urlDataHandler;
+            this.httpClientBusiness = httpClientBusiness;
         }
 
-        public string GetLongUrl(string ShortUrl)
+        public async Task<string> GetLongUrlAsync(string ShortUrl)
         {
-            return this.urlDataHandler.GetLongUrl(ShortUrl);
+            return await this.urlDataHandler.GetLongUrlAsync(ShortUrl);
         }
 
-        public string ShortenUrl(string url, int keyLength)
+        public async Task<string> ShortenUrlAsync(string url, int keyLength)
         {
             string newKey = null;
 
@@ -37,53 +40,22 @@ namespace ShortUrlWebApi.BusinessImpl
             {
                 var uri = new Uri(url);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw ;
+                throw ex;
             }
 
-            if (this.HttpGetStatusCodeAsync(url).Result != HttpStatusCode.NotFound)
+            if (await this.httpClientBusiness.ValidateURLAsync(url) && (string.IsNullOrEmpty(newKey)))
             {
-                while (string.IsNullOrEmpty(newKey))
-                {
-                    newKey = Guid.NewGuid().ToString("N").Substring(0, keyLength == 0 ? 6 : keyLength).ToLower();
-                }
+                newKey = Guid.NewGuid().ToString("N").Substring(0, keyLength == 0 ? 6 : keyLength).ToLower();
             }
 
             return newKey;
         }
 
-        public void SaveShortUrl(string shortUrl, string longUrl)
+        public async Task SaveShortUrlAsync(string shortUrl, string longUrl)
         {
-            this.urlDataHandler.SaveShortUrl(shortUrl, longUrl);
-        }
-
-        public async Task<HttpStatusCode> HttpGetStatusCodeAsync(string Url)
-        {
-            try
-            {
-                var httpclient = new HttpClient();
-                var response = await httpclient.GetAsync(Url, HttpCompletionOption.ResponseHeadersRead);
-
-                string text = null;
-
-                using (var stream = await response.Content.ReadAsStreamAsync())
-                {
-                    var bytes = new byte[10];
-                    var bytesread = stream.Read(bytes, 0, 10);
-                    stream.Close();
-
-                    text = Encoding.UTF8.GetString(bytes);
-
-                    Console.WriteLine(text);
-                }
-
-                return response.StatusCode;
-            }
-            catch (Exception)
-            {
-                return HttpStatusCode.NotFound;
-            }
+            await this.urlDataHandler.SaveShortUrlAsync(shortUrl, longUrl);
         }
     }
 }

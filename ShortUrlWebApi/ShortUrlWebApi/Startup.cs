@@ -34,6 +34,7 @@ namespace ShortUrlWebApi
             services.AddControllers();
             services.Add(new ServiceDescriptor(typeof(IUrlBusiness), typeof(UrlBusiness), ServiceLifetime.Transient));
             services.Add(new ServiceDescriptor(typeof(IUrlDataHandler), typeof(UrlDataHandler), ServiceLifetime.Transient));
+            services.Add(new ServiceDescriptor(typeof(IHttpClientBusiness), typeof(HttpClientBusiness), ServiceLifetime.Transient));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

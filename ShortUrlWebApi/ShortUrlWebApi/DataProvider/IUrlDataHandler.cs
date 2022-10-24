@@ -1,8 +1,11 @@
-﻿namespace ShortUrlWebApi.DataProvider
+﻿using System.Threading.Tasks;
+
+namespace ShortUrlWebApi.DataProvider
 {
     public interface IUrlDataHandler
     {
-        public string GetLongUrl(string ShortUrl);
-        public void SaveShortUrl(string shortUrl, string longUrl);
+        Task<string> GetLongUrlAsync(string ShortUrl);
+
+        Task SaveShortUrlAsync(string shortUrl, string longUrl);
     }
 }
